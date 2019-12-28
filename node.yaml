@@ -1,0 +1,42 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: nodeapp
+  labels:
+    app: nodeapp
+spec:
+  selector:
+    app: nodeapp
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+  type: LoadBalancer
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nodeapp
+  labels:
+    app: nodeapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nodeapp
+  template:
+    metadata:
+      labels:
+        app: nodeapp
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/id: "nodeapp"
+        dapr.io/port: "3000"
+    spec:
+      containers:
+        - name: node
+          image: trumhemcut/nodeapp
+          ports:
+            - containerPort: 3000
+          imagePullPolicy: Always
